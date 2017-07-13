@@ -1,0 +1,36 @@
+﻿<Window x:Class="NoteWpfApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:NoteWpfApp"
+        mc:Ignorable="d"
+        Title="Дневник" Height="350" Width="525"
+        Loaded="Window_Loaded">
+    <Canvas Name="canvas">
+        <Button Width="100" Padding="10" Name="btn" Content="Меню" Click="btn_Click" Canvas.Left="448" Canvas.Top="127" RenderTransformOrigin="0.5,0.5">
+            <Button.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="90"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Button.RenderTransform>
+        </Button>
+        <Border BorderBrush="Gray" CornerRadius="0, 10, 10, 10" BorderThickness="2" Name="brd"
+                Canvas.Top="112" Canvas.Left="332">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBox Margin="5" Padding="5" TextWrapping="Wrap" TextAlignment="Center">Поиск</TextBox>
+                <StackPanel Grid.Column="1">
+                    <Button Margin="5,0,5,5" Padding="5">Сохранить</Button>
+                    <Button Margin="5" Padding="5">Очистить</Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Canvas>
+</Window>
