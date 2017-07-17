@@ -1,17 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.IO;
 using NoteWpfApp.Models;
+using System;
+using System.Collections.Generic;
 
 namespace NoteWpfApp.Classes
 {
+    /// <summary>
+    /// Незавершенный,необходимо обработать ситуацию повторного добавления таой же даты
+    /// </summary>
     public class DataWorker
     {
-        const string pathToXml = "D:/MyNote.xml"; 
+        string pathToXml { get; set; }
+
+        public DataWorker(string path)
+        {
+            pathToXml = path;
+        }
+
+        public DataWorker()
+        {
+            pathToXml = "D:/MyNote.xml";
+        }
+
         public void SaveData(XmlModel data)
         {
             if (!File.Exists(pathToXml))
@@ -22,14 +35,64 @@ namespace NoteWpfApp.Classes
                 textWritter.WriteEndElement();
                 textWritter.Close();
             }
-            AddDocument(data).Save(pathToXml);
-        }
-        public XmlModel LoadData()
-        {
-            return()
+
+            CreateDocument(data).Save(pathToXml);
         }
 
-        public XmlDocument AddDocument(XmlModel data)
+        public List<XmlModel> LoadData()
+        {
+            List<XmlModel> datas = new List<XmlModel>();
+            XmlDocument xDoc = new XmlDocument();
+            xDoc.Load(pathToXml);
+            XmlElement xRoot = xDoc.DocumentElement;
+            foreach (XmlNode xnode in xRoot)
+            {
+                //получаем data
+                XmlModel data = new XmlModel();
+                data.Notes = new List<NoteModel>();
+                data.Spendings = new List<SpendingModel>();
+                // получаем атрибут date
+                if (xnode.Attributes.Count > 0)
+                {
+                    XmlNode attr = xnode.Attributes.GetNamedItem("date");
+                    if (attr != null)
+                        data.Date = DateTime.Parse(attr.Value);
+                }
+                // обходим все дочерние узлы элемента spendings
+                foreach (XmlNode childnode in xnode.ChildNodes)
+                {
+                    if (childnode.Name == "spending")
+                    {
+                        SpendingModel spending = new SpendingModel();
+                        foreach (XmlNode child in childnode.ChildNodes)
+                        {
+                            if (child.Name == "amount")
+                            {
+                                spending.Message = child.Value;
+                            }
+                            if (child.Name == "message")
+                            {
+                                spending.Message = child.Value;
+                            }
+                        }
+                        data.Spendings.Add(spending);
+                    }
+                    else
+                    {
+                        NoteModel note = new NoteModel();
+                        foreach (XmlNode child in childnode.ChildNodes)
+                        {
+                            note.Message = child.Value;
+                        }
+                        data.Notes.Add(note);
+                    }
+                }
+                datas.Add(data);
+            }
+            return datas;
+        }
+
+        public XmlDocument CreateDocument(XmlModel data)
         {
             XmlDocument document = new XmlDocument();
             document.Load(pathToXml);
@@ -57,10 +120,17 @@ namespace NoteWpfApp.Classes
             foreach (var note in data.Notes)
             {
                 var subElementNote = document.CreateElement("note");
-                subElementNote.InnerText = note.Message;
                 subElementNotes.AppendChild(subElementNote);
+                var subElementNoteMessage = document.CreateElement("message");
+                subElementNoteMessage.InnerText = note.Message;
+                subElementNote.AppendChild(subElementNoteMessage);
             }
             return document;
+        }
+
+        public XmlDocument ChangeDocument()
+        {
+
         }
     }
 }
